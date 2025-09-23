@@ -17,6 +17,18 @@ class MovieController extends Controller
         return view('admin.movie.index', compact('movies'));
     }
 
+    public function home()
+    {
+        // where ('field', 'operator', 'value') : mencari data
+        // operator : = / < / <= / > / >= / <> / !=
+        // orderBy('field', 'ASC/DESC') : : mengurutkan data
+        // ASC : a-z, 0-9 terlama-terbaru, DESC : 9-0, z-a, tebaru-terlama
+        // limit(angka) : mengambil hanya beberapa data
+        // get() : ambil hasil proses filter
+        $movies = Movie::where('activated', 1)->orderBy('created_at', 'DESC')->limit(3)->get();
+        return view('home', compact('movies'));
+    }
+
     /**
      * Show the form for creating a new resource.
      */
