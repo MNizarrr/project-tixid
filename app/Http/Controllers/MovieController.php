@@ -1,0 +1,111 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Movie;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+class MovieController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $movies = Movie::all();
+        return view('admin.movie.index', compact('movies'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('admin.movie.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // dd($request->all());
+        $request->validate([
+            'title' => 'required',
+            'duration' => 'required',
+            'genre' => 'required',
+            'director' => 'required',
+            'age_rating' => 'required',
+            //mimes : Memastikan ekstensi (jenis file) yg di upload
+            'poster' => 'required|mimes:jpg,jpeg,png,svg,webp',
+            'description' => 'required|min:10',
+        ],[
+            'title.required' => 'Judul film harus di isi',
+            'duration.required' => 'Durasi film harus di isi',
+            'genre.required' => 'Genre film harus di isi',
+            'director.required' => 'Sutradara film harus di isi',
+            'age_rating.required' => 'Usia minimal haus di isi',
+            'poster.required' => 'Poster film harus di isi',
+            'poster.mimes' => 'Poster harus berupa jpg/jpeg/png/svg/webp',
+            'description.required' => 'Sinopsis film harus di isi',
+            'description.min' => 'Sinopsi harus di isi minimal 10 karakter'
+        ]);
+        //ambil file nya
+        $poster = $request->file('poster');
+        // baut nama nari untuk file nya
+        // formas file baru yang di harapkan acak : <acak>-poster.jpg
+        // getClientOriginalExtension() : mengambil ekstensi file yang di upload
+        $namaFile = Str::random(10) . "-poster." . $poster->getClientOriginalExtension();
+        //simpan file ke folder storage : store AS("namasubfolder", namafile, "visibility")
+        $path = $poster->storeAs("poster", $namaFile, "public");
+        $createData = Movie::create([
+            'title' => $request->title,
+            'duration' => $request->duration,
+            'genre' => $request->genre,
+            'director' => $request->director,
+            'age_rating' => $request->age_rating,
+            //poster di isi dengan hasil storeAS hasil penyimpanan file di storage sebelumnya
+            'poster' => $path,
+            'description' => $request->description,
+            'activated' => 1
+        ]);
+        if ($createData) {
+            return redirect()->route('admin.movies.index')->with('success', 'Berhasil menambahkan data!');
+        }else{
+            return redirect()->back()->with('error', 'Gagal! Silahkan voba lagi.');
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Movie $movie)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Movie $movie)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Movie $movie)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Movie $movie)
+    {
+        //
+    }
+}
