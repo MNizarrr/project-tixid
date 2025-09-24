@@ -36,10 +36,19 @@
                         {{-- event (tanda depan on-) JS : menentukan kapan js di baca --}}
                         {{-- on click : menjalankan JS ketika btn di klik --}}
                         <button class="btn btn-secondary me-2" onclick="showModal({{ $item }})">Detail</button>
-                        <a href="" class="btn btn-primary me-2">Edit</a>
-                        <button class="btn btn-danger me-2">Hapus</button>
-                        @if ($item['activated'] == 1) {{-- dimunculkan hanya jika filmnya aktif --}}
-                            <button class="btn btn-warning">Non-Aktif Film</button>
+                        <a href="{{ route('admin.movies.edit', $item['id']) }}" class="btn btn-primary me-2">Edit</a>
+                        {{-- <button class="btn btn-danger me-2">Hapus</button> --}}
+                        <form action="{{ route('admin.movies.delete', $item->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-danger me-2">Hapus</button>
+                        </form>
+                        @if ($item['activated'] == 1)
+                            <form action="{{ route('admin.movies.nonactive', $item->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <button class="btn btn-warning">Non-Aktif Film</button>
+                            </form>
                         @endif
                     </th>
                 </tr>
@@ -78,16 +87,16 @@
             // membuat konten yg akan di tambahkan
             // backtip (diatas tab) : menulis strin glebih dari 1 baris
             let content = `
-            <img src="${image}" width="120" class="d-block mx-auto my-3">
-            <ul>
-                <li>Judul : ${item.title}</li>
-                <li>Durasi : ${item.duration}</li>
-                <li>Genre : ${item.genre}</li>
-                <li>Sutradara : ${item.director}</li>
-                <li>Usia Minimal : <span class="badge badge-danger">${item.age_rating}</span></li>
-                <li>Sinopsis : ${item.description}</li>
-            </ul>
-            `;
+                                <img src="${image}" width="120" class="d-block mx-auto my-3">
+                                <ul>
+                                    <li>Judul : ${item.title}</li>
+                                    <li>Durasi : ${item.duration}</li>
+                                    <li>Genre : ${item.genre}</li>
+                                    <li>Sutradara : ${item.director}</li>
+                                    <li>Usia Minimal : <span class="badge badge-danger">${item.age_rating}</span></li>
+                                    <li>Sinopsis : ${item.description}</li>
+                                </ul>
+                                `;
             // mengambil element html yg akan di simpan di konten di atas : document.querySelector()
             let modalDetailBody = document.querySelector("#modalDetailBody");
             // isi html di atas ke id="modalDetailBody"

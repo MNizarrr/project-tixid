@@ -94,14 +94,14 @@
             </div>
             {{-- konten kanan --}}
             <div>
-                <button class="btn btn-warning rounded-pill">Semua</button>
+                <a href="{{ route('home.movies.all') }}" class="btn btn-warning rounded-pill">Semua</a>
             </div>
         </div>
     </div>
 
     <div class="container d-flex gap-2">
         {{-- gap-2 jarak antar komponen --}}
-        <button class="btn btn-outline-primary rounded-pill">Semua Film</button>
+        <a href="{{ route('home.movies.all') }}" class="btn btn-outline-primary rounded-pill">Semua Film</a>
         <button class="btn btn-outline-secondary rounded-pill">XXI</button>
         <button class="btn btn-outline-secondary rounded-pill">Cinepolis</button>
         <button class="btn btn-outline-secondary rounded-pill">IMax</button>

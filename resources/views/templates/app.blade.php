@@ -58,6 +58,13 @@
                                 </li>
                             </ul>
                         </li>
+                    @elseif (Auth::check() && Auth::user()->role == 'staff')
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Jadwal Tiket</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Promo</a>
+                        </li>
                     @else
                         {{-- jika bukan admin/belum login, muncul ini --}}
                         <li class="nav-item">
@@ -106,8 +113,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/9.1.0/mdb.umd.min.js">
     </script>
 
-{{-- konten dinamis JS --}}
-@stack('script')
+    {{-- konten dinamis JS --}}
+    @stack('script')
 </body>
 
 </html>

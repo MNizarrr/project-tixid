@@ -61,15 +61,17 @@ class UserController extends Controller
             'password.required' => 'Passwoord Harus Diisi'
         ]);
 
-        $data = $request->only(['password', 'email']);
+        $data = $request->only(['email', 'password']);
         if (Auth::attempt($data)) {
             if (Auth::user()->role == 'admin') {
                 return redirect()->route('admin.dashboard')->with('Success', 'Berhasil Login!');
-            } else {
+            } elseif (Auth::user()->role == 'staff') {
+                return redirect()->route('staff.dashboard')->with('Success', 'Berhasil Login!');
+            }else {
                 return redirect()->route('home')->with('Success', 'Berhasil Login!');
             }
         } else {
-            return redirect()->back()->with('Error', 'Gagal! Pastikan Email dan Password Benar');
+            return redirect()->back()->with('error', 'Gagal! Pastikan Email dan Password Benar');
         }
     }
 
@@ -111,7 +113,7 @@ class UserController extends Controller
         ]);
 
         if ($createData) {
-            return redirect()->route('admin.user.index')->with('Success', 'Berhasil membuat data baru!');
+            return redirect()->route('admin.users.index')->with('Success', 'Berhasil membuat data baru!');
         } else {
             return redirect()->back()->with('Error', 'Gagal, silahkan coba lagi!');
         }
@@ -131,7 +133,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::find($id);
-        return view('admin.user.edit', compact('user'));
+        return view('admin.users.edit', compact('user'));
     }
 
     /**
@@ -155,7 +157,7 @@ class UserController extends Controller
         ]);
 
         if ($updateData) {
-            return redirect()->route('admin.user.index')->with('Success', 'Berhasil mengubah data');
+            return redirect()->route('admin.users.index')->with('Success', 'Berhasil mengubah data');
         } else {
             return redirect()->back()->with('Error', 'Gagal! silahkan coba lagi');
         }
@@ -167,6 +169,6 @@ class UserController extends Controller
     public function destroy($id)
     {
         User::where('id', $id)->delete();
-        return redirect()->route('admin.user.index')->with('Success', 'Berhasil menghapus data!');
+        return redirect()->route('admin.users.index')->with('Success', 'Berhasil menghapus data!');
     }
 }
