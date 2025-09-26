@@ -46,7 +46,7 @@ class CinemaController extends Controller
         ]);
 
         if ($createData) {
-            return redirect()->route('admin.cinema.index')->with('Success', 'Berhasil membuat data baru!');
+            return redirect()->route('admin.cinemas.index')->with('Success', 'Berhasil membuat data baru!');
         } else {
             return redirect()->back()->with('Error', 'Gagal, silakan coba lagi');
         }

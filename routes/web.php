@@ -8,6 +8,7 @@
 
 use App\Http\Controllers\CinemaController;
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\PromoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use PHPUnit\Framework\Attributes\Group;
@@ -74,12 +75,23 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [UserController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('delete');
-    });
+    })->name('dashboard');
+
 });
 
-Route::prefix('/staff')->name('staff.')->group(function() {
-    Route::get('/dashboard', function() {
-        return view('staff.dashboard');})->name('dashboard');
+Route::prefix('/staff')->name('staff.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('staff.dashboard');
+    })->name('dashboard');
+
+    Route::prefix('/promos')->name('promos.')->group(function () {
+        Route::get('/index', [PromoController::class, 'index'])->name('index');
+        Route::get('/create', [PromoController::class, 'create'])->name('create');
+        Route::post('/store', [PromoController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [PromoController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [PromoController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [PromoController::class, 'destroy'])->name('delete');
+    });
 });
 
 Route::middleware('isGuest')->group(function () {
