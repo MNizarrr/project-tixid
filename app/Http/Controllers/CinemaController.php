@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CinemaExport;
 use App\Models\Cinema;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CinemaController extends Controller
 {
@@ -34,7 +36,7 @@ class CinemaController extends Controller
         $request->validate([
             'name' => 'required',
             'location' => 'required|min:10',
-        ],[
+        ], [
             'name.required' => 'Nama biokop harus di isi',
             'location.required' => 'Lokasi harus di isi',
             'location.min' => 'Lokasi harus di isi setidaknya 10 karakter'
@@ -78,7 +80,7 @@ class CinemaController extends Controller
         $request->validate([
             'name' => 'required',
             'location' => 'required|min:10',
-        ],[
+        ], [
             'name.required' => 'Nama bioskop wajib di isi',
             'location.required' => 'Lokasi bioskop harus di isi',
             'location.min' => 'Lokasi bioskop harus di isi minimal 10 karakter'
@@ -103,5 +105,14 @@ class CinemaController extends Controller
     {
         Cinema::where('id', $id)->delete();
         return redirect()->route('admin.cinema.index')->with('Success', 'Berhasil menghapus data!');
+    }
+
+    public function export()
+    {
+        // name file yg akan di download
+        // ekstensi antara xlsx/csv
+        $fileName = "data-bioskop.xlsx";
+        // proses download
+        return Excel::download(new CinemaExport, $fileName);
     }
 }

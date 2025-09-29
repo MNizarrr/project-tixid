@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UserExport;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -170,5 +172,11 @@ class UserController extends Controller
     {
         User::where('id', $id)->delete();
         return redirect()->route('admin.users.index')->with('Success', 'Berhasil menghapus data!');
+    }
+
+    public function export()
+    {
+        $fileName = "data-pengguna.xlsx";
+        return Excel::download(new UserExport, $fileName);
     }
 }

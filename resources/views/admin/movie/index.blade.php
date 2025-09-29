@@ -7,6 +7,7 @@
             ('success') }}</div>
         @endif
         <div class="d-flex justify-content-end">
+            <a href="{{ route('admin.movies.export') }}" class="btn btn-secondary me-2">export (.Xlsx)</a>
             <a href="{{ route('admin.movies.create') }}" class="btn btn-success">Tambah Data</a>
         </div>
         <h5 class="mb-3">Data Film</h5>

@@ -53,6 +53,7 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::get('/edit/{id}', [CinemaController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [CinemaController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [CinemaController::class, 'destroy'])->name('delete');
+        Route::get('/export', action: [CinemaController::class, 'export'])->name('export');
     });
 
     //film
@@ -64,6 +65,7 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::put('/update/{id}', [MovieController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [MovieController::class, 'destroy'])->name('delete');
         Route::put('/nonactive/{id}', [MovieController::class, 'nonactive'])->name('nonactive');
+        Route::get('/export', action: [MovieController::class, 'export'])->name('export');
     });
 
     //pengguna
@@ -75,6 +77,7 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [UserController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('delete');
+        Route::get('/export', action: [UserController::class, 'export'])->name('export');
     })->name('dashboard');
 
 });
@@ -91,6 +94,7 @@ Route::prefix('/staff')->name('staff.')->group(function () {
         Route::get('/edit/{id}', [PromoController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [PromoController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [PromoController::class, 'destroy'])->name('delete');
+        Route::get('/export', action: [PromoController::class, 'export'])->name('export');
     });
 });
 

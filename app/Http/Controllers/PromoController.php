@@ -6,7 +6,7 @@ use App\Models\Promo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Exports\PromoExport;
-
+use Maatwebsite\Excel\Facades\Excel;
 
 class PromoController extends Controller
 {
@@ -88,4 +88,9 @@ class PromoController extends Controller
         return redirect()->route('staff.promos.index')->with('success', 'Promo berhasil dihapus');
     }
 
+        public function export()
+    {
+        $fileName = "data-promo.xlsx";
+        return Excel::download(new PromoExport, $fileName);
+    }
 }

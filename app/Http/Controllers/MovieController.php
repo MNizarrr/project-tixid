@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\DescriptionList\Node\Description;
 use Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\MovieExport;
 
 class MovieController extends Controller
 {
@@ -197,6 +199,14 @@ class MovieController extends Controller
         $movies->delete();
 
         return redirect()->route('admin.movies.index')->with('success', 'Berhasil menghapus data!');
+    }
 
+    public function export()
+    {
+        // name file yg akan di download
+        // ekstensi antara xlsx/csv
+        $fileName = "data-film.xlsx";
+        // proses download
+        return Excel::download(new MovieExport(), $fileName);
     }
 }
