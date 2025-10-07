@@ -9,6 +9,7 @@
 use App\Http\Controllers\CinemaController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,11 +17,8 @@ use PHPUnit\Framework\Attributes\Group;
 Route::get('/', [MovieController::class, 'home'])->name('home');
 Route::get('/movies/active', [MovieController::class, 'homeMovies'])->name('home.movies.all');
 
-Route::get('/schedules/detail', function () {
-    //standar penulisan :
-    // path (mengacu ke data/fitur) gunakan jamak, folder view fitur gunakan tunggal
-    return view('schedule.detail');
-})->name('schedules.detail');
+Route::get('/schedules/detail/{movie_id}', [MovieController::class, 'movieSchedule'])
+->name('schedules.detail');
 
 Route::get('/cinema', function () {
     return view('cinema');
@@ -95,6 +93,12 @@ Route::prefix('/staff')->name('staff.')->group(function () {
         Route::put('/update/{id}', [PromoController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [PromoController::class, 'destroy'])->name('delete');
         Route::get('/export', action: [PromoController::class, 'export'])->name('export');
+    });
+
+    //jadwal tayang
+    Route::prefix('/schedules')->name('schedules.')->group(function(){
+        Route::get('/', [ScheduleController::class, 'index',])->name('index');
+        Route::post('store', [ScheduleController::class, 'store'])->name('store');
     });
 });
 

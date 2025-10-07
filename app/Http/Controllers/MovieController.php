@@ -39,6 +39,17 @@ class MovieController extends Controller
         return view('movies', compact('movies'));
     }
 
+    public function movieSchedule($movie_id)
+    {
+        // ambil data movie bersama schedule  dan cinema
+        // karn cinema adanya relasi dengan schedule bukan movie, jd gunakan schedule.cinema
+        $movie = Movie::where('id', $movie_id)->with(['schedules', 'schedules.cinema'])->first();
+        // schedules : mengambil relasi schedules
+        // schedules.cinema : ambil relasi cinema dari schedule
+        // first() : karna mau ambil 1 film
+        return view('auth.schedule.detail', compact('movie'));
+    }
+
     public function nonActive($id)
     {
         $movies = Movie::findOrFail($id);

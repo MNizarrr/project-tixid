@@ -117,7 +117,7 @@
                     {{-- karna default card-text ada paddingnya, biar padding yg di baca dr style jd dikasi
                     !important(memprioritaskan styling) --}}
                     <p class="card-text" style="padding: 0 !important; text-align: center; font-weight: bold;">
-                        <a href="{{ Route('schedules.detail') }}" class="text-warning">Beli Tiket</a>
+                        <a href="{{ Route('schedules.detail', $item['id']) }}" class="text-warning">Beli Tiket</a>
                     </p>
                 </div>
             </div>
