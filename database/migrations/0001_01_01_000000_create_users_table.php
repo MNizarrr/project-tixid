@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamps();   //created_at updated_at
             // Softdeletes : sistem recycle bin, menghapus tpi tidak terhapus sepenuhnya
             $table->softDeletes();
-        });
+        });~
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

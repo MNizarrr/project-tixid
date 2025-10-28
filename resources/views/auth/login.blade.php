@@ -19,14 +19,14 @@
 
     <form class="w-50 d-block mx-auto my-5" method="POST" action="{{ route('auth')}}">
         @csrf
-        @if (Session::get('Success'))
+        @if (Session::get('success'))
             {{-- Session hurufnya di awali dengan huruf besar karena dia sebuah class yang di sambungkan dengan Static di
             sambungkan dengan :: --}}
-            <div class="alert alert-success my-3">{{ Session::get('Succcess') }}
+            <div class="alert alert-success my-3">{{ Session::get('succcess') }}
             </div>
         @endif
-        @if (Session::get('Error'))
-            <div class="alert alert-danger">{{ Session::get('Error')}}</div>
+        @if (Session::get('error'))
+            <div class="alert alert-danger">{{ Session::get('error')}}</div>
         @endif
         <!-- Email input -->
         @error('email')

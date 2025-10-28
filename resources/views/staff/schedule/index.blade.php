@@ -4,6 +4,8 @@
     <div class="container my-5">
         <div class="d-flex justify-content-end">
             {{-- menggunakan button karna untuk modal bukan pindah halaman --}}
+            <a href="{{ route('staff.schedules.trash') }}" class="btn btn-secondary me-2">Data Sampah</a>
+            <a href="{{ route('staff.schedules.export') }}" class="btn btn-secondary me-2">export (.Xlsx)</a>
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAdd">Tambah Data</button>
         </div>
         <h3 class="my-3">Data Jadwal Tayang</h3>
@@ -23,10 +25,10 @@
             </tr>
             @foreach ($schedules as $key => $schedule)
                 <tr>
-                    <td>{{ $key+1 }}</td>
+                    <td>{{ $key + 1 }}</td>
                     <td>{{ $schedule['cinema']['name'] }}</td>
                     <td>{{ $schedule['movie']['title'] }}</td>
-                    <td>Rp. {{ number_format($schedule['price'], 0,',', '.') }}</td>
+                    <td>Rp. {{ number_format($schedule['price'], 0, ',', '.') }}</td>
                     {{-- karna hours, array munculkandengan loop --}}
                     <td>
                         <ul>
@@ -36,8 +38,12 @@
                         </ul>
                     </td>
                     <td class="d-flex">
-                        <a href="" class="btn btn-primary">Edit</a>
-                        <button class="btn btn-danger ms-2">Hapus</button>
+                        <a href="{{ route('staff.schedules.edit', $schedule->id) }}" class="btn btn-primary">Edit</a>
+                        <form action="{{ route('staff.schedules.delete', $schedule->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-danger ms-2">Hapus</button>
+                        </form>
                     </td>
                 </tr>
             @endforeach
@@ -101,9 +107,9 @@
                             <div class="mb-3">
                                 <label for="hours" class="form-label">Jam Tayang :</label>
                                 <input type="time" name="hours[]" id="hours" class="form-control
-                                        @if ($errors->has('hours.*'))
-                                            is-invalid
-                                        @endif">
+                                            @if ($errors->has('hours.*'))
+                                                is-invalid
+                                            @endif">
                                 {{-- sediakan tempat untuk penambahan input baru dari JS, gunakan id untuk pemanggilan JS
                                 --}}
                                 <div id="additionalInput"></div>

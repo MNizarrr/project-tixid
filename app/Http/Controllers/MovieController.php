@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\DescriptionList\Node\Description;
@@ -33,8 +34,18 @@ class MovieController extends Controller
         return view('home', compact('movies'));
     }
 
-    public function homeMovies()
+    public function homeMovies(Request $request)
     {
+        // ambil $request input search
+        $nameMovie = $request->search_movie;
+        // cek jika input name="search_movie" tidak kosong
+        if($nameMovie != ""){
+            // LIKE : mencari kata yang mengandung teks tertentu
+            // % didepan : mencari kata belakang, % di belakang : mencari data di depan, % depan belakang : mencari di depan tengah belakang
+            $movies = Movie::where('title', 'LIKE', '%' . $nameMovie . '%')->where('activated', 1)->orderBy('created_at', 'DESC')->get();
+        }else{
+            $movies = Movie::where('activated', 1)->orderBy('created_at', 'DESC')->get();
+        }
         $movies = Movie::where('activated', 1)->orderBy('created_at', 'DESC')->get();
         return view('movies', compact('movies'));
     }
@@ -53,11 +64,11 @@ class MovieController extends Controller
     public function nonActive($id)
     {
         $movies = Movie::findOrFail($id);
-        $nonAktifData = $movies->update(['activated' => 0 ]);
+        $nonAktifData = $movies->update(['activated' => 0]);
         if ($nonAktifData) {
-            return redirect()->route('admin.movies.index')->with('Success', 'Berhasil menambahkan data!');
+            return redirect()->route('admin.movies.index')->with('success', 'Berhasil menambahkan data!');
         } else {
-            return redirect()->back()->with('Error', 'Gagal! Silahkan voba lagi.');
+            return redirect()->back()->with('error', 'Gagal! Silahkan voba lagi.');
         }
     }
 
@@ -115,9 +126,9 @@ class MovieController extends Controller
             'activated' => 1
         ]);
         if ($createData) {
-            return redirect()->route('admin.movies.index')->with('Success', 'Berhasil menambahkan data!');
+            return redirect()->route('admin.movies.index')->with('success', 'Berhasil menambahkan data!');
         } else {
-            return redirect()->back()->with('Error', 'Gagal! Silahkan voba lagi.');
+            return redirect()->back()->with('error', 'Gagal! Silahkan voba lagi.');
         }
     }
 
@@ -192,7 +203,7 @@ class MovieController extends Controller
         if ($updateData) {
             return redirect()->route('admin.movies.index')->with('success', 'Berhasil memperbarui data!');
         } else {
-            return redirect()->back()->with('Error', 'Gagal, silahkan coba lagi.');
+            return redirect()->back()->with('error', 'Gagal, silahkan coba lagi.');
         }
     }
 
@@ -201,16 +212,14 @@ class MovieController extends Controller
      */
     public function destroy($id)
     {
-        $movies = Movie::findOrFail($id);
+        $movie = Movie::findOrFail($id);
 
-        if ($movies->poster && Storage::disk('public')->exists($movies->poster)) {
-            Storage::disk('public')->delete($movies->poster);
-        }
+        // Hapus sementara (soft delete), file tidak dihapus
+        $movie->delete();
 
-        $movies->delete();
-
-        return redirect()->route('admin.movies.index')->with('success', 'Berhasil menghapus data!');
+        return redirect()->route('admin.movies.index')->with('success', 'Film dihapus sementara!');
     }
+
 
     public function export()
     {
@@ -220,4 +229,34 @@ class MovieController extends Controller
         // proses download
         return Excel::download(new MovieExport(), $fileName);
     }
+
+    public function trash()
+    {
+        // onlytrashed() -> filter data yang sudah di hapus, delete_at BUKAN NULL
+        $movieTrash = Movie::onlyTrashed()->get();
+        return view('admin.movie.trash', compact('movieTrash'));
+    }
+
+    public function restore($id)
+    {
+        // restore()-> mengembalikan data yang sudah di hapus (menghapus nilai tanggal pada delete_at)
+        $movie = Movie::onlyTrashed()->find($id);
+        $movie->restore();
+        return redirect()->route('admin.movies.index')->with('success', 'Berhasil mengambil data!');
+    }
+
+    public function deletePermanent($id)
+    {
+        $movie = Movie::onlyTrashed()->findOrFail($id);
+
+        // Hapus file poster jika ada
+        if ($movie->poster && file_exists(storage_path('app/public/' . $movie->poster))) {
+            unlink(storage_path('app/public/' . $movie->poster));
+        }
+
+        $movie->forceDelete();
+
+        return redirect()->back()->with('success', 'Film dihapus permanen beserta posternya!');
+    }
+
 }

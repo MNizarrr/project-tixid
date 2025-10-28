@@ -46,9 +46,9 @@ class UserController extends Controller
         ]);
 
         if ($createData) {
-            return redirect()->route('login')->with('Success', 'Berhasil membuat akun Silahkan login!');
+            return redirect()->route('login')->with('success', 'Berhasil membuat akun Silahkan login!');
         } else {
-            return redirect()->route('signup')->with('Error', 'Gagal memperoleh data! Silahkan coba lagi!');
+            return redirect()->route('signup')->with('error', 'Gagal memperoleh data! Silahkan coba lagi!');
         }
     }
 
@@ -66,11 +66,11 @@ class UserController extends Controller
         $data = $request->only(['email', 'password']);
         if (Auth::attempt($data)) {
             if (Auth::user()->role == 'admin') {
-                return redirect()->route('admin.dashboard')->with('Success', 'Berhasil Login!');
-            } elseif (Auth::user()->role == 'staff') {
-                return redirect()->route('staff.dashboard')->with('Success', 'Berhasil Login!');
-            }else {
-                return redirect()->route('home')->with('Success', 'Berhasil Login!');
+                return redirect()->route('admin.dashboard')->with('success', 'Berhasil Login!');
+            } elseif (Auth::user()->role == 'admin') {
+                return redirect()->route('admin.dashboard')->with('success', 'Berhasil Login!');
+            } else {
+                return redirect()->route('home')->with('success', 'Berhasil Login!');
             }
         } else {
             return redirect()->back()->with('error', 'Gagal! Pastikan Email dan Password Benar');
@@ -110,14 +110,14 @@ class UserController extends Controller
         $createData = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'role' => 'staff',
+            'role' => 'admin',
             'password' => $request->password,
         ]);
 
         if ($createData) {
-            return redirect()->route('admin.users.index')->with('Success', 'Berhasil membuat data baru!');
+            return redirect()->route('admin.users.index')->with('success', 'Berhasil membuat data baru!');
         } else {
-            return redirect()->back()->with('Error', 'Gagal, silahkan coba lagi!');
+            return redirect()->back()->with('error', 'Gagal, silahkan coba lagi!');
         }
     }
 
@@ -150,7 +150,7 @@ class UserController extends Controller
             'name.required' => 'Nama wajib di isi',
             'email.required' => 'Email wajib di isi',
             'email.email' => 'Email tidak valid',
-            'role' => 'staff',
+            'role' => 'admin',
         ]);
 
         $updateData = User::where('id', $id)->update([
@@ -159,9 +159,9 @@ class UserController extends Controller
         ]);
 
         if ($updateData) {
-            return redirect()->route('admin.users.index')->with('Success', 'Berhasil mengubah data');
+            return redirect()->route('admin.users.index')->with('success', 'Berhasil mengubah data');
         } else {
-            return redirect()->back()->with('Error', 'Gagal! silahkan coba lagi');
+            return redirect()->back()->with('error', 'Gagal! silahkan coba lagi');
         }
     }
 
@@ -171,12 +171,33 @@ class UserController extends Controller
     public function destroy($id)
     {
         User::where('id', $id)->delete();
-        return redirect()->route('admin.users.index')->with('Success', 'Berhasil menghapus data!');
+        return redirect()->route('admin.users.index')->with('success', 'Berhasil menghapus data!');
     }
 
     public function export()
     {
-        $fileName = "data-pengguna.xlsx";
-        return Excel::download(new UserExport, $fileName);
+        return Excel::download(new UserExport, 'users.xlsx');
+    }
+
+    public function trash()
+    {
+        // onlytrashed() -> filter data yang sudah di hapus, delete_at BUKAN NULL
+        $userTrash = User::onlyTrashed()->get();
+        return view('admin.user.trash', compact('userTrash'));
+    }
+
+    public function restore($id)
+    {
+        // restore()-> mengembalikan data yang sudah di hapus (menghapus nilai tanggal pada delete_at)
+        $user = User::onlyTrashed()->find($id);
+        $user->restore();
+        return redirect()->route('admin.users.index')->with('success', 'Berhasil mengambil data!');
+    }
+
+    public function deletePermanent($id)
+    {
+        $user = User::onlyTrashed()->find($id);
+        $user->forceDelete();
+        return redirect()->back()->with('success', 'Berhasil menghapus seutuhnya!');
     }
 }

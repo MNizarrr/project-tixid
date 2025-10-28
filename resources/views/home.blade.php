@@ -3,9 +3,9 @@
 
 {{-- ngisi yield --}}
 @section('content')
-    @if (Session::get('Success'))
+    @if (Session::get('success'))
         {{-- Auth User() mengambil data user yang login --}}
-        <div class="alert alert-success my-3">{{session::get('Success')}} <b>Selamat datang, {{Auth::user()->name}}</b></div>
+        <div class="alert alert-success my-3">{{session::get('success')}} <b>Selamat datang, {{Auth::user()->name}}</b></div>
         {{-- Auth::user()->name : kata name di ambil dari model user - fillable --}}
     @endif
 

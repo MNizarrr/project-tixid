@@ -3,10 +3,13 @@
 @section('content')
     <div class="container my-5">
         @if (Session::get('success'))
-            <div class="alert alert-success">{{ Session::get
-            ('success') }}</div>
+            <div class="alert alert-success">{{ Session::get('success') }}</div>
+        @endif
+        @if (Session::get('error'))
+            <div class="alert alert-danger">{{ Session::get('error') }}</div>
         @endif
         <div class="d-flex justify-content-end">
+            <a href="{{ route('admin.movies.trash') }}" class="btn btn-secondary me-2">Data Sampah</a>
             <a href="{{ route('admin.movies.export') }}" class="btn btn-secondary me-2">export (.Xlsx)</a>
             <a href="{{ route('admin.movies.create') }}" class="btn btn-success">Tambah Data</a>
         </div>
@@ -17,7 +20,7 @@
                 <th>Poster</th>
                 <th>Judul Film</th>
                 <th>Status Aktif</th>
-                <th>Aktif</th>
+                <th>Aksi</th>
             </tr>
             @foreach ($movies as $key => $item)
                 <tr>
@@ -88,16 +91,16 @@
             // membuat konten yg akan di tambahkan
             // backtip (diatas tab) : menulis strin glebih dari 1 baris
             let content = `
-                                <img src="${image}" width="120" class="d-block mx-auto my-3">
-                                <ul>
-                                    <li>Judul : ${item.title}</li>
-                                    <li>Durasi : ${item.duration}</li>
-                                    <li>Genre : ${item.genre}</li>
-                                    <li>Sutradara : ${item.director}</li>
-                                    <li>Usia Minimal : <span class="badge badge-danger">${item.age_rating}</span></li>
-                                    <li>Sinopsis : ${item.description}</li>
-                                </ul>
-                                `;
+                                    <img src="${image}" width="120" class="d-block mx-auto my-3">
+                                    <ul>
+                                        <li>Judul : ${item.title}</li>
+                                        <li>Durasi : ${item.duration}</li>
+                                        <li>Genre : ${item.genre}</li>
+                                        <li>Sutradara : ${item.director}</li>
+                                        <li>Usia Minimal : <span class="badge badge-danger">${item.age_rating}</span></li>
+                                        <li>Sinopsis : ${item.description}</li>
+                                    </ul>
+                                    `;
             // mengambil element html yg akan di simpan di konten di atas : document.querySelector()
             let modalDetailBody = document.querySelector("#modalDetailBody");
             // isi html di atas ke id="modalDetailBody"

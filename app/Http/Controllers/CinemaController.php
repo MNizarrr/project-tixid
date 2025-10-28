@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\CinemaExport;
 use App\Models\Cinema;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -48,9 +49,9 @@ class CinemaController extends Controller
         ]);
 
         if ($createData) {
-            return redirect()->route('admin.cinemas.index')->with('Success', 'Berhasil membuat data baru!');
+            return redirect()->route('admin.cinemas.index')->with('success', 'Berhasil membuat data baru!');
         } else {
-            return redirect()->back()->with('Error', 'Gagal, silakan coba lagi');
+            return redirect()->back()->with('error', 'Gagal, silakan coba lagi');
         }
     }
 
@@ -92,9 +93,9 @@ class CinemaController extends Controller
         ]);
 
         if ($updateData) {
-            return redirect()->route('admin.cinema.index')->with('Success', 'Berhasil mengubah data');
+            return redirect()->route('admin.cinema.index')->with('success', 'Berhasil mengubah data');
         } else {
-            return redirect()->back()->with('Error', 'Gagal! silahkan coba lagi');
+            return redirect()->back()->with('error', 'Gagal! silahkan coba lagi');
         }
     }
 
@@ -103,8 +104,13 @@ class CinemaController extends Controller
      */
     public function destroy($id)
     {
+        $schedules = Schedule::where('cinema_id', $id)->count();
+        if ($schedules) {
+            return redirect()->route('admin.cinemas.index')->with('error', 'Tidak dapat menghapus data bioskop! Data tertaut dengan jadwal tayang');
+        }
+
         Cinema::where('id', $id)->delete();
-        return redirect()->route('admin.cinema.index')->with('Success', 'Berhasil menghapus data!');
+        return redirect()->route('admin.cinema.index')->with('success', 'Berhasil menghapus data!');
     }
 
     public function export()
@@ -114,5 +120,26 @@ class CinemaController extends Controller
         $fileName = "data-bioskop.xlsx";
         // proses download
         return Excel::download(new CinemaExport, $fileName);
+    }
+
+    public function trash()
+    {
+        // onlytrashed() -> filter data yang sudah di hapus, delete_at BUKAN NULL
+        $cinemaTrash = Cinema::onlyTrashed()->get();
+        return view('admin.cinema.trash', compact('cinemaTrash'));
+    }
+    public function restore($id)
+    {
+        // restore()-> mengembalikan data yang sudah di hapus (menghapus nilai tanggal pada delete_at)
+        $cinema = Cinema::onlyTrashed()->find($id);
+        $cinema->restore();
+        return redirect()->route('admin.cinemas.index')->with('success', 'Berhasil mengambil data!');
+    }
+
+    public function deletePermanent($id)
+    {
+        $cinema = Cinema::onlyTrashed()->find($id);
+        $cinema->forceDelete();
+        return redirect()->back()->with('success', 'Berhasil menghapus seutuhnya!');
     }
 }

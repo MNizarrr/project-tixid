@@ -2,10 +2,14 @@
 
 @section('content')
     <div class="container mt-5">
-        @if (Session::get('Success'))
-            <div class="alert alert-success">{{ Session::get('Success') }}</div>
+        @if (Session::get('success'))
+            <div class="alert alert-success">{{ Session::get('success') }}</div>
+        @endif
+        @if (Session::get('error'))
+            <div class="alert alert-danger">{{ Session::get('error') }}</div>
         @endif
         <div class="d-flex justify-content-end">
+            <a href="{{ route('admin.cinemas.trash') }}" class="btn btn-secondary me-2">Data Sampah</a>
             <a href="{{ route('admin.cinemas.export') }}" class="btn btn-secondary me-2">export (.Xlsx)</a>
             <a href="{{ route('admin.cinemas.create')}}" class="btn btn-success">Tambah Data</a>
         </div>

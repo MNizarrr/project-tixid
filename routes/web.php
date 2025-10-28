@@ -3,7 +3,7 @@
 // 4 routing HTTP method
 // get untuk menampilkan sebuah halaman
 // post untuk memproses penambahan data baru
-// patch untuk mengubah data kalo
+// patch untuk mengubah data yang sudah ada
 // delete untuk menghapus
 
 use App\Http\Controllers\CinemaController;
@@ -18,7 +18,7 @@ Route::get('/', [MovieController::class, 'home'])->name('home');
 Route::get('/movies/active', [MovieController::class, 'homeMovies'])->name('home.movies.all');
 
 Route::get('/schedules/detail/{movie_id}', [MovieController::class, 'movieSchedule'])
-->name('schedules.detail');
+    ->name('schedules.detail');
 
 Route::get('/cinema', function () {
     return view('cinema');
@@ -37,7 +37,7 @@ Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 //untuk halaman admin
 
 //prefix() : memberikan path awalan, /admin ditulis 1x bisa di pake berkali kali
-Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function () {
+Route::middleware(middleware: 'isAdmin')->prefix('/admin')->name('admin.')->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
@@ -52,6 +52,9 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::put('/update/{id}', [CinemaController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [CinemaController::class, 'destroy'])->name('delete');
         Route::get('/export', action: [CinemaController::class, 'export'])->name('export');
+        Route::get('trash', [CinemaController::class, 'trash'])->name(name: 'trash');
+        Route::patch('/restore/{id}', [CinemaController::class, 'restore'])->name('restore');
+        Route::delete('/delete-permanent/{id}', [CinemaController::class, 'deletePermanent'])->name('delete_permanent');
     });
 
     //film
@@ -64,6 +67,9 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::delete('/delete/{id}', [MovieController::class, 'destroy'])->name('delete');
         Route::put('/nonactive/{id}', [MovieController::class, 'nonactive'])->name('nonactive');
         Route::get('/export', action: [MovieController::class, 'export'])->name('export');
+        Route::get('trash', [MovieController::class, 'trash'])->name('trash');
+        Route::patch('/restore/{id}', [MovieController::class, 'restore'])->name('restore');
+        Route::delete('/delete-permanent/{id}', [MovieController::class, 'deletePermanent'])->name('delete_permanent');
     });
 
     //pengguna
@@ -72,10 +78,13 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::get('/create', [UserController::class, 'create'])->name('create');
         Route::post('/store', [UserController::class, 'store'])->name('store');
         // paameter placeholder - {id} : Mencari data spesifik
-        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit');
+        Route::get('/   /{id}', [UserController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [UserController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('delete');
         Route::get('/export', action: [UserController::class, 'export'])->name('export');
+        Route::get('trash', [UserController::class, 'trash'])->name('trash');
+        Route::patch('/restore/{id}', [UserController::class, 'restore'])->name('restore');
+        Route::delete('/delete-permanent/{id}', [UserController::class, 'deletePermanent'])->name('delete_permanent');
     })->name('dashboard');
 
 });
@@ -93,12 +102,22 @@ Route::prefix('/staff')->name('staff.')->group(function () {
         Route::put('/update/{id}', [PromoController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [PromoController::class, 'destroy'])->name('delete');
         Route::get('/export', action: [PromoController::class, 'export'])->name('export');
+        Route::get('trash', [PromoController::class, 'trash'])->name('trash');
+        Route::patch('/restore/{id}', [PromoController::class, 'restore'])->name('restore');
+        Route::delete('/delete-permanent/{id}', [PromoController::class, 'deletePermanent'])->name('delete_permanent');
     });
 
     //jadwal tayang
-    Route::prefix('/schedules')->name('schedules.')->group(function(){
+    Route::prefix('/schedules')->name('schedules.')->group(function () {
         Route::get('/', [ScheduleController::class, 'index',])->name('index');
         Route::post('store', [ScheduleController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [ScheduleController::class, 'edit'])->name('edit');
+        Route::patch('/update/{id}', [ScheduleController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [ScheduleController::class, 'destroy'])->name('delete');
+        Route::get('/export', action: [ScheduleController::class, 'export'])->name('export');
+        Route::get('trash', [ScheduleController::class, 'trash'])->name('trash');
+        Route::patch('/restore/{id}', [ScheduleController::class, 'restore'])->name('restore');
+        Route::delete('/delete-permanent/{id}', [ScheduleController::class, 'deletePermanent'])->name('delete_permanent');
     });
 });
 

@@ -2,10 +2,11 @@
 
 @section('content')
     <div class="container mt-5">
-        @if (Session::get('Success'))
-            <div class="alert alert-success">{{ Session::get('Success') }}</div>
+        @if (Session::get('success'))
+            <div class="alert alert-success">{{ Session::get('success') }}</div>
         @endif
         <div class="d-flex justify-content-end">
+            <a href="{{ route('admin.users.trash') }}" class="btn btn-secondary me-2">Data Sampah</a>
             <a href="{{ route('admin.users.export') }}" class="btn btn-secondary me-2">export (.Xlsx)</a>
             <a href="{{ route('admin.users.create')}}" class="btn btn-success">Tambah Data</a>
         </div>
@@ -33,11 +34,11 @@
                         @endif
                     </th>
                     <th class="d-flex justify-content-center align-items-center gap-2">
-                        <a href="{{ route('admin.users.edit', ['id' => $item['id']])}}" class="btn btn-primary">Edit</a>
+                        <a href="{{ route('admin.users.edit', ['id' => $item['id']])}}" class="btn btn-primary"><i class="fa-solid fa-trash"></i></a>
                         <form action="{{ route('admin.users.delete', ['id' => $item['id']]) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-danger">Hapus</button>
+                            <button class="btn btn-danger"><i class="fa-solid fa-pen"></i></button>
                         </form>
                     </th>
                 </tr>

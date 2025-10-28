@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ScheduleExport;
 use App\Models\Schedule;
 use App\Models\Cinema;
 use App\Models\Movie;
 use Illuminate\Http\Request;
+use App\Exports\UserExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ScheduleController extends Controller
 {
@@ -65,14 +68,14 @@ class ScheduleController extends Controller
         $createData = Schedule::updateOrCreate([
             'cinema_id' => $request->cinema_id,
             'movie_id' => $request->movie_id,
-        ],[
+        ], [
             'price' => $request->price,
             // jam penggabungan sebelum dan baru dari proses di atas
             'hours' => $newHours,
         ]);
 
-        if($createData) {
-            return  redirect()->route('staff.schedules.index')->with('success', 'Berhasil Menambahkan Data');
+        if ($createData) {
+            return redirect()->route('staff.schedules.index')->with('success', 'Berhasil Menambahkan Data');
         } else {
             return redirect()->back()->with('error', 'Gagal! Coba lagi');
         }
@@ -89,24 +92,73 @@ class ScheduleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Schedule $schedule)
+    public function edit(Schedule $schedule, $id)
     {
-        //
+        $schedule = Schedule::where('id', $id)->with(['cinema', 'movie'])->first();
+        return view('staff.schedule.edit', compact('schedule'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Schedule $schedule)
+    public function update(Request $request, Schedule $schedule, $id)
     {
-        //
+        $request->validate([
+            'price' => 'required|numeric',
+            'hours.*' => 'required|date_format:H:i'
+        ], [
+            'price.required' => 'Harga harus di isi',
+            'price.numeric' => 'harga harus di isi dengan angka',
+            'hours.*.required' => 'Jam tayang harus di isi',
+            'hours.*.date_format' => 'Jam tayang harus di isi dengan jam:menit'
+        ]);
+
+        $updateData = Schedule::where('id', $id)->update([
+            'price' => $request->price,
+            'hours' => $request->hours
+        ]);
+
+        if ($updateData) {
+            return redirect()->route('staff.schedules.index')->with('success', 'Berhasil mengubah data!');
+        } else {
+            return redirect()->back()->with('error', 'Gagal! coba lagi');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Schedule $schedule)
+    public function destroy(Schedule $schedule, $id)
     {
-        //
+        Schedule::where('id', $id)->delete();
+        return redirect()->route('staff.schedules.index')->with('success', 'Berhasil menghapus data');
+    }
+
+    public function export()
+    {
+        $fileName = "data-jadwalTiket.xlsx";
+        return Excel::download(new ScheduleExport, $fileName);
+    }
+
+    public function trash()
+    {
+        // onlytrashed() -> filter data yang sudah di hapus, delete_at BUKAN NULL
+        $scheduleTrash = Schedule::with(['cinema', 'movie'])->onlyTrashed()->get();
+        return view('staff.schedule.trash', compact('scheduleTrash'));
+    }
+
+    public function restore($id)
+    {
+        // restore()-> mengembalikan data yang sudah di hapus (menghapus nilai tanggal pada delete_at)
+        $schedule = Schedule::onlyTrashed()->find($id);
+        $schedule->restore();
+        return redirect()->route('staff.schedules.index')->with('success', 'Berhasil mengambil data!');
+    }
+
+    public function deletePermanent($id)
+    {
+        $schedule = Schedule::onlyTrashed()->find($id);
+        $schedule->forceDelete();
+        return redirect()->back()->with('success', 'Berhasil menghapus seutuhnya!');
     }
 }
