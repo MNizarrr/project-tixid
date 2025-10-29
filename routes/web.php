@@ -37,7 +37,7 @@ Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 //untuk halaman admin
 
 //prefix() : memberikan path awalan, /admin ditulis 1x bisa di pake berkali kali
-Route::middleware(middleware: 'isAdmin')->prefix('/admin')->name('admin.')->group(function () {
+Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');

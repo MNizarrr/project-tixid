@@ -50,15 +50,37 @@ class MovieController extends Controller
         return view('movies', compact('movies'));
     }
 
-    public function movieSchedule($movie_id)
+    public function movieSchedule($movie_id, Request $request)
     {
+        $sortPrice = $request->sort_price ?: 'ASC';
+
+        if ($sortPrice){
+             $movie = Movie::where('id', $movie_id)->with(['schedules' => function($q)
+                use($sortPrice){
+                    // karna mau ngurutkan berdasar price di table schedules. schedule itu ada di relasi jd gunakan fungsi anonim
+                    // $q : query eloquent, mewakili model relasi (model schedule)
+                $q->orderBy('price', $sortPrice);
+             }, 'schedules.cinema'])->first();
+        }else{
+            $movie = Movie::where('id', $movie_id)->with(['schedules', 'schedules.cinema'])->first();
+        }
+
+        $sortAlfabet = $request->sort_alfabet;
+        if ($sortAlfabet == 'ASC') {
+            $movie->schedules = $movie->schedules->sortBy(function($schedule){
+                return $schedule->cinema->name;
+            })->values();
+        }elseif($sortAlfabet == 'DESC') {
+            $movie->schedules = $movie->schedules->sortByDesc(function($schedule){
+                return $schedule->cinema->name;
+            })->values();
+        }
         // ambil data movie bersama schedule  dan cinema
         // karn cinema adanya relasi dengan schedule bukan movie, jd gunakan schedule.cinema
-        $movie = Movie::where('id', $movie_id)->with(['schedules', 'schedules.cinema'])->first();
         // schedules : mengambil relasi schedules
         // schedules.cinema : ambil relasi cinema dari schedule
         // first() : karna mau ambil 1 film
-        return view('auth.schedule.detail', compact('movie'));
+        return view('auth.schedule.detail', compact('movie', 'sortPrice'));
     }
 
     public function nonActive($id)

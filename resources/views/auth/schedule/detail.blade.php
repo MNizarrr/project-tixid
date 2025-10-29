@@ -14,7 +14,7 @@
                         <tr>
                             <td><b class="text-secondary">Genre</b></td>
                             <td class="px-3"></td>
-                            <td>{{ $movie['gnere'] }}</td>
+                            <td>{{ $movie['genre'] }}</td>
                         </tr>
                         <tr>
                             <td><b class="text-secondary">Durasi</b></td>
@@ -38,7 +38,7 @@
                 <div class="col-6 pe-5">
                     <div class="d-flex flex-column justify-content-end align-items-end">
                         <div class="d-flex align-items-center">
-                            <h3 class="text-warning me-2">10</h3>
+                            <h3 class="text-warning me-2">3.7</h3>
                             <i class="fas fa-star text-warning"></i>
                             <i class="fas fa-star text-warning"></i>
                             <i class="fas fa-star text-warning"></i>
@@ -68,17 +68,35 @@
                             @endforeach
                         </ul>
                     </div>
+                    @php
+                        // request()->get('name query') : memanggil query params (?) di url
+                        // jika ? nilainya ASC ubah jd DESC
+                        if (Request()->get('sort_price') == 'ASC'){
+                            $sortPrice = 'DESC';
+                        } elseif(Request()->get('sort_price') == 'DESC'){
+                            // jiak query params sort_price DESC, uabh jadi ASC
+                            $sortPrice = 'ASC';
+                        }else{
+                            $sortPrice = 'ASC';
+                        }
+
+                        if (Request()->get('sort_alfabet') == 'ASC'){
+                            $sortAlfabet = 'DESC';
+                        } elseif(Request()->get('sort_alfabet') == 'DESC'){
+                            // jiak query params sort_alfabet DESC, uabh jadi ASC
+                            $sortAlfabet = 'ASC';
+                        }else{
+                            $sortAlfabet = 'ASC';
+                        }
+                    @endphp
                     <div class="dropdown">
                         <button class="btn btn-light w-100 text-start dropdown-toggle" type="button" id="dropdownMenuButton"
                             data-mdb-dropdown-init data-mdb-ripple-init aria-expanded="false">
                             Sortir
                         </button>
                         <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item" href="#">Jakarta</a></li>
-                            <li><a class="dropdown-item" href="#">Bogor</a></li>
-                            <li><a class="dropdown-item" href="#">Depok</a></li>
-                            <li><a class="dropdown-item" href="#">Tangerang</a></li>
-                            <li><a class="dropdown-item" href="#">Bekasi</a></li>
+                            <li><a class="dropdown-item" href="?sort_price={{ $sortPrice }}">Harga</a></li>
+                            <li><a class="dropdown-item" href="?sort_alfabet={{ $sortAlfabet }}">Alphabet</a></li>
                         </ul>
                     </div>
                 </div>
@@ -86,12 +104,23 @@
             <div class="mb-5">
                 @foreach ($movie['schedules'] as $schedule)
                     <div class="w-100 my-3">
-                        <i class="fa-solid fa-building"></i><b class="ms-2">{{ $schedule['cinema']['name'] }}</b>
-                        <br>
-                        <small class="ms-3">{{ $schedule['cinema']['location'] }}</small>
+                        <div class="d-flex justify-content-between">
+                            {{-- kanan --}}
+                            <div class="">
+                                <i class="fa-solid fa-building"></i><b class="ms-2">{{ $schedule['cinema']['name'] }}</b>
+                                <br>
+                                <small class="ms-3">{{ $schedule['cinema']['location'] }}</small>
+                            </div>
+
+                            {{-- kiri --}}
+                            <div class="">
+                                <b>Rp. {{ number_format($schedule['price'], 0, ',', '.') }}</b>
+                            </div>
+                        </div>
+
                         <div class="d-flex gap-3 ps-3 my-2">
                             @foreach ($schedule['hours'] as $hours)
-                                <div class="btn btn-outline -secondary">{{ $hours }}</div>
+                                <div class="btn btn-outline-secondary">{{ $hours }}</div>
                             @endforeach
                         </div>
                     </div>
