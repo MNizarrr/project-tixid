@@ -55,6 +55,7 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::get('trash', [CinemaController::class, 'trash'])->name(name: 'trash');
         Route::patch('/restore/{id}', [CinemaController::class, 'restore'])->name('restore');
         Route::delete('/delete-permanent/{id}', [CinemaController::class, 'deletePermanent'])->name('delete_permanent');
+        Route::get('/datatables', [CinemaController::class, 'datatables'])->name('datatables');
     });
 
     //film
@@ -70,6 +71,7 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::get('trash', [MovieController::class, 'trash'])->name('trash');
         Route::patch('/restore/{id}', [MovieController::class, 'restore'])->name('restore');
         Route::delete('/delete-permanent/{id}', [MovieController::class, 'deletePermanent'])->name('delete_permanent');
+        Route::get('/datatables', [MovieController::class, 'datatables'])->name('datatables');
     });
 
     //pengguna
@@ -85,6 +87,7 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function (
         Route::get('trash', [UserController::class, 'trash'])->name('trash');
         Route::patch('/restore/{id}', [UserController::class, 'restore'])->name('restore');
         Route::delete('/delete-permanent/{id}', [UserController::class, 'deletePermanent'])->name('delete_permanent');
+        Route::get('/datatables', [UserController::class, 'datatables'])->name('datatables');
     })->name('dashboard');
 
 });
@@ -105,6 +108,7 @@ Route::prefix('/staff')->name('staff.')->group(function () {
         Route::get('trash', [PromoController::class, 'trash'])->name('trash');
         Route::patch('/restore/{id}', [PromoController::class, 'restore'])->name('restore');
         Route::delete('/delete-permanent/{id}', [PromoController::class, 'deletePermanent'])->name('delete_permanent');
+        Route::get('/datatables', [PromoController::class, 'datatables'])->name('datatables');
     });
 
     //jadwal tayang
@@ -118,6 +122,7 @@ Route::prefix('/staff')->name('staff.')->group(function () {
         Route::get('trash', [ScheduleController::class, 'trash'])->name('trash');
         Route::patch('/restore/{id}', [ScheduleController::class, 'restore'])->name('restore');
         Route::delete('/delete-permanent/{id}', [ScheduleController::class, 'deletePermanent'])->name('delete_permanent');
+        Route::get('/datatables', [ScheduleController::class, 'datatables'])->name('datatables');
     });
 });
 

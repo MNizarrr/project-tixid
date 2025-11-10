@@ -9,6 +9,7 @@ use App\Models\Movie;
 use Illuminate\Http\Request;
 use App\Exports\UserExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Yajra\DataTables\Facades\DataTables;
 
 class ScheduleController extends Controller
 {
@@ -25,6 +26,45 @@ class ScheduleController extends Controller
         $schedules = Schedule::with(['cinema', 'movie'])->get();
         return view('staff.schedule.index', compact('cinemas', 'movies', 'schedules'));
     }
+
+public function datatables()
+{
+    $schedules = Schedule::query()->with(['cinema', 'movie'])->get();
+    return DataTables::of($schedules)
+    ->addIndexColumn()
+    ->addColumn('cinema_name', function($schedule){
+        return $schedule->cinema->name;
+    })
+    ->addColumn('movie_title', function($schedule){
+        return $schedule->movie->title;
+    })
+    ->addColumn('price', function($schedule){
+        return 'Rp. ' . number_format($schedule->price, 0, ',', '.');
+    })
+    ->addColumn('hours', function($schedule){
+        if(is_array($schedule->hours)) {
+            $list = '<ul>';
+            foreach ($schedule->hours as $hours) {
+                $list .='<li>' . $hours . '<li>';
+            }
+            $list .='</ul>';
+            return $list;
+        }
+    })
+    ->addColumn('action', function ($schedule) {
+            $btnEdit = '<a href="' . route('staff.schedules.edit', $schedule->id) . '" class="btn btn-primary">Edit</a>';
+            $btnDelete = '
+            <form action="' . route('staff.schedules.delete', $schedule->id) . '" method="POST"> ' .
+                @csrf_field() .
+                @method_field('DELETE') . '
+                <button type="submit" class="btn btn-danger ms-2">Hapus</button>
+            </form>';
+
+            return '<div class="d-flex justify-content-center align-items-center gap-2">' . $btnEdit . $btnDelete . '</div>';
+        })
+        ->rawColumns(['cinema_name', 'movie_title','price', 'hours', 'action'])
+        ->make(true);
+}
 
     /**
      * Show the form for creating a new resource.

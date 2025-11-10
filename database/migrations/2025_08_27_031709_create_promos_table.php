@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('promos', function (Blueprint $table) {
             $table->id();
-            $table->string('proomo_code');
+            $table->string('promo_code');
             $table->integer('discount');
             $table->enum('type', ['percent', 'rupiah']);
-            $table->boolean('activated');
+            $table->boolean('activated')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

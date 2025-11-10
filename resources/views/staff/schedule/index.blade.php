@@ -14,7 +14,8 @@
                 {{ Session::get('success') }}
             </div>
         @endif
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="schedulesTable">
+        <thead>
             <tr>
                 <th>#</th>
                 <th>Nama Bioskop</th>
@@ -23,13 +24,13 @@
                 <th>Jadwal Tayang</th>
                 <th>Aksi</th>
             </tr>
-            @foreach ($schedules as $key => $schedule)
+        </thead>
+            {{-- @foreach ($schedules as $key => $schedule)
                 <tr>
                     <td>{{ $key + 1 }}</td>
                     <td>{{ $schedule['cinema']['name'] }}</td>
                     <td>{{ $schedule['movie']['title'] }}</td>
-                    <td>Rp. {{ number_format($schedule['price'], 0, ',', '.') }}</td>
-                    {{-- karna hours, array munculkandengan loop --}}
+                    <td>Rp. {{ number_format($schedule['hours'], 0, ',', '.') }}</td>
                     <td>
                         <ul>
                             @foreach ($schedule['hours'] as $hours)
@@ -46,7 +47,7 @@
                         </form>
                     </td>
                 </tr>
-            @endforeach
+            @endforeach --}}
         </table>
 
         {{-- modal --}}
@@ -131,6 +132,23 @@
 
 @push('script')
     <script>
+
+        $(function(){
+            $('#schedulesTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('staff.schedules.datatables') }}",
+                columns: [
+                    {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable:false, searchable:false},
+                    {data: 'cinema_name', name: 'cinema_name', orderable:true, searchable:true},
+                    {data: 'movie_title', name: 'movie_title', orderable:true, searchable:true},
+                    {data: 'price', name: 'price', orderable:false, searchable:false},
+                    {data: 'hours', name: 'movie_id', orderable:false, searchable:false},
+                    {data: 'action', name: 'action', orderable:false, searchable:false},
+                ]
+            });
+        });
+
         function addInput() {
             let content = `<input type="time" name="hours[]" id="hours" class="form-control mt-2">`;
             // ambil tempat input akan di simpan

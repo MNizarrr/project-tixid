@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Exports\PromoExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Yajra\DataTables\Facades\DataTables;
 
 class PromoController extends Controller
 {
@@ -14,6 +15,34 @@ class PromoController extends Controller
     {
         $promos = Promo::all();
         return view('staff.promo.index', compact('promos'));
+    }
+
+    public function datatables()
+    {
+        $promos = Promo::query();
+        return DataTables::of($promos)
+            ->addIndexColumn()
+            ->addColumn('discount', function ($promo) {
+                if ($promo->type === 'percent')
+                    return '<span class="badge badge-warning">' . $promo['discount'] . ' % </span>';
+                elseif ($promo->type === 'rupiah')
+                    return '<span class="badge badge-success">Rp . ' . number_format($promo['discount'], 0, ',', '.') . '</span>';
+                else {
+                    return $promo->discount;
+                }
+            })
+            ->addColumn('action', function ($promo) {
+                $btnEdit = '<a href="' . route('staff.promos.edit', $promo->id) . '" class="btn btn-primary">Edit</i></a>';
+                $btnDelete = '
+            <form action="' . route('staff.promos.delete', $promo->id) . '" method="POST">
+            ' . csrf_field() . method_field('DELETE') . '
+                <button class="btn btn-danger">Hapus</button>
+            </form>';
+
+                return '<div class="d-flex justify-content-center align-items-center gap-2">' . $btnEdit . $btnDelete . '</div>';
+            })
+            ->rawColumns([ 'discount', 'action'])
+            ->make(true);
     }
 
     public function create()
@@ -25,8 +54,8 @@ class PromoController extends Controller
     {
         $request->validate([
             'promo_code' => 'required|unique:promos,promo_code',
-            'type'       => 'required|in:percent,rupiah',
-            'discount'   => 'required|numeric|min:1',
+            'type' => 'required|in:percent,rupiah',
+            'discount' => 'required|numeric|min:1',
         ]);
 
 
@@ -40,9 +69,9 @@ class PromoController extends Controller
 
         Promo::create([
             'promo_code' => $request->promo_code,
-            'type'       => $request->type,
-            'discount'   => $request->discount,
-            'actived'    => 1
+            'type' => $request->type,
+            'discount' => $request->discount,
+            'activated' => 1
         ]);
 
         return redirect()->route('staff.promos.index')->with('success', 'Promo berhasil ditambahkan');
@@ -57,9 +86,9 @@ class PromoController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'promo_code' => 'required|unique:promos,promo_code,' . $id ,
-            'discount'   => 'required|numeric|min:1',
-            'type'       => 'required|in:percent,rupiah',
+            'promo_code' => 'required|unique:promos,promo_code,' . $id,
+            'discount' => 'required|numeric|min:1',
+            'type' => 'required|in:percent,rupiah',
         ]);
 
         if ($request->type === 'percent' && $request->discount > 100) {
@@ -73,8 +102,8 @@ class PromoController extends Controller
         $promo = Promo::findOrFail($id);
         $promo->update([
             'promo_code' => $request->promo_code,
-            'discount'   => $request->discount,
-            'type'       => $request->type,
+            'discount' => $request->discount,
+            'type' => $request->type,
         ]);
 
         return redirect()->route('staff.promos.index')->with('success', 'Promo berhasil diperbarui');
@@ -88,13 +117,13 @@ class PromoController extends Controller
         return redirect()->route('staff.promos.index')->with('success', 'Promo berhasil dihapus');
     }
 
-        public function export()
+    public function export()
     {
         $fileName = "data-promo.xlsx";
         return Excel::download(new PromoExport, $fileName);
     }
 
-        public function trash()
+    public function trash()
     {
         // onlytrashed() -> filter data yang sudah di hapus, delete_at BUKAN NULL
         $promoTrash = Promo::onlyTrashed()->get();

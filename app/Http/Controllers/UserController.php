@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
@@ -18,6 +19,39 @@ class UserController extends Controller
     {
         $users = User::whereIn('role', ['admin', 'staff'])->get();
         return view('admin.user.index', compact('users'));
+    }
+
+    public function datatables()
+    {
+        $users = User::query();
+        return DataTables::of($users)
+        ->addIndexColumn()
+        // ->addColumn('name', function($user){
+        //     return $user->name;
+        // })
+        // ->addColumn('email', function($user){
+        //     return $user->email;
+        // })
+        ->addColumn('role', function($user){
+            if ($user->role === 'admin')
+                return '<span class="badge badge-primary">admin</span>';
+            elseif ($user->role === 'staff')
+                return '<span class="badge badge-success">staff</span>';
+            else
+                return '<span class="badge badge-secondary">' . $user->role . '</span>';
+        })
+        ->addColumn('action', function($user){
+            $btnEdit = '<a href="' . route('admin.users.edit',  $user->id). '" class="btn btn-primary">Edit</i></a>';
+            $btnDelete = '
+            <form action="' . route('admin.users.delete',  $user->id) . '" method="POST">
+            ' . csrf_field() . method_field('DELETE') . '
+                <button class="btn btn-danger">Hapus</button>
+            </form>';
+
+            return '<div class="d-flex justify-content-center align-items-center gap-2">' . $btnEdit . $btnDelete . '</div>';
+        })
+        ->rawColumns(['name', 'email', 'role', 'action' ])
+        ->make(true);
     }
 
     public function register(Request $request)

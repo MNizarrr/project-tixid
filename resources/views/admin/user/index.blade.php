@@ -11,15 +11,17 @@
             <a href="{{ route('admin.users.create')}}" class="btn btn-success">Tambah Data</a>
         </div>
         <h5 class="mt-3">Data pengguna</h5>
-        <table class="table table-bordered">
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Aksi</th>
-            </tr>
-            @foreach ($users as $index => $item)
+        <table class="table table-bordered" id="usersTable">
+            <thead>
+                <tr>
+                    <th class="text-center">No</th>
+                    <th class="text-center">Nama</th>
+                    <th class="text-center">Email</th>
+                    <th class="text-center">Role</th>
+                    <th class="text-center">Aksi</th>
+                </tr>
+            </thead>
+            {{-- @foreach ($users as $index => $item)
                 <tr>
                     <th>{{ $index + 1 }}</th>
                     <th>{{ $item['name'] }}</th>
@@ -42,7 +44,28 @@
                         </form>
                     </th>
                 </tr>
-            @endforeach
+            @endforeach --}}
         </table>
     </div>
 @endsection
+
+@push('script')
+    <script>
+
+        $(function () {
+            $('#usersTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('admin.users.datatables') }}",
+                columns: [
+                    {data : 'DT_RowIndex', name: 'DT_RowIndex', orderable:false, searchable:false},
+                    {data : 'name', name: 'name', orderable:true, searchable:true},
+                    {data : 'email', name: 'email', orderable:true, searchable:true},
+                    {data : 'role', name: 'role', orderable:true, searchable:true},
+                    {data : 'action', name: 'action', orderable:false, searchable:false}
+                ]
+            });
+        });
+
+    </script>
+@endpush
