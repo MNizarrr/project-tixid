@@ -20,7 +20,11 @@ Route::get('/movies/active', [MovieController::class, 'homeMovies'])->name('home
 Route::get('/schedules/detail/{movie_id}', [MovieController::class, 'movieSchedule'])
     ->name('schedules.detail');
 
-Route::get('/cinema', function () {
+Route::middleware('isUser')->group(function() {
+    Route::get('/schedules/{scheduleId}/hours/{hourId}', [ScheduleController::class, 'showSeats'])->name('schedules.show_seats');
+});
+
+Route::get('/cinema', function ()   {
     return view('cinema');
 })->name('cinema');
 
@@ -33,6 +37,11 @@ Route::post('/signup', [UserController::class, 'register'])->name('signup.send_d
 Route::post('/auth', [UserController::class, 'authentication'])->name('auth');
 
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
+
+// menu "bioskop" pada navbar user
+Route::get('/cinemas/list', [CinemaController::class, 'cinemaList'])->name('cinemas.list');
+Route::get('/cinemas/{cinema_id}/schedules', [CinemaController::class, 'cinemaSchedules'])->name('cinemas.schedules');
+
 
 //untuk halaman admin
 

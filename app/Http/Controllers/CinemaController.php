@@ -26,19 +26,19 @@ class CinemaController extends Controller
     {
         $cinemas = Cinema::query();
         return DataTables::of($cinemas)
-        ->addIndexColumn()
-        ->addColumn('action', function($cinema){
-            $btnEdit = '<a href="' . route('admin.cinemas.edit',  $cinema->id). '" class="btn btn-primary">Edit</i></a>';
-            $btnDelete = '
-            <form action="' . route('admin.cinemas.delete',  $cinema->id) . '" method="POST">
+            ->addIndexColumn()
+            ->addColumn('action', function ($cinema) {
+                $btnEdit = '<a href="' . route('admin.cinemas.edit', $cinema->id) . '" class="btn btn-primary">Edit</i></a>';
+                $btnDelete = '
+            <form action="' . route('admin.cinemas.delete', $cinema->id) . '" method="POST">
             ' . csrf_field() . method_field('DELETE') . '
                 <button class="btn btn-danger">Hapus</button>
             </form>';
 
-            return '<div class="d-flex justify-content-center align-items-center gap-2">' . $btnEdit . $btnDelete . '</div>';
-        })
-        ->rawColumns(['name', 'location', 'action'])
-        ->make(true);
+                return '<div class="d-flex justify-content-center align-items-center gap-2">' . $btnEdit . $btnDelete . '</div>';
+            })
+            ->rawColumns(['name', 'location', 'action'])
+            ->make(true);
     }
 
     /**
@@ -161,5 +161,19 @@ class CinemaController extends Controller
         $cinema = Cinema::onlyTrashed()->find($id);
         $cinema->forceDelete();
         return redirect()->back()->with('success', 'Berhasil menghapus seutuhnya!');
+    }
+
+    public function cinemaList()
+    {
+        $cinemas = Cinema::all();
+        return view('schedule.cinemas', compact('cinemas'));
+    }
+
+    public function cinemaSchedules($cinema_id)
+    {
+        $schedules = Schedule::where('cinema_id', $cinema_id)->with('movie')->whereHas('movie', function ($q) {
+            $q->where('activated', 1);
+        })->get();
+        return view('schedule.cinema-schedules', compact('schedules'));
     }
 }

@@ -73,10 +73,10 @@
                     @else
                         {{-- jika bukan admin/belum login, muncul ini --}}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Beranda</a>
+                            <a class="nav-link" href="{{ route('home') }}">Beranda</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Bioskop</a>
+                            <a class="nav-link" href="{{ route('cinemas.list') }}">Bioskop</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Tiket</a>

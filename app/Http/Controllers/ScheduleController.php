@@ -201,4 +201,11 @@ public function datatables()
         $schedule->forceDelete();
         return redirect()->back()->with('success', 'Berhasil menghapus seutuhnya!');
     }
+
+    public function showSeats($scheduleId, $hourId)
+    {
+        $schedule = Schedule::where('id', $scheduleId)->with('cinema')->first();
+        $hour = $schedule['hours'][$hourId];
+        return view('schedule.show-seats', compact('schedule', 'hour'));
+    }
 }

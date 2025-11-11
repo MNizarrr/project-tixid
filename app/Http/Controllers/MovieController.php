@@ -116,7 +116,7 @@ class MovieController extends Controller
         // schedules : mengambil relasi schedules
         // schedules.cinema : ambil relasi cinema dari schedule
         // first() : karna mau ambil 1 film
-        return view('auth.schedule.detail', compact('movie', 'sortPrice'));
+        return view('schedule.detail', compact('movie', 'sortPrice'));
     }
 
     public function nonActive($id)
