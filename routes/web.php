@@ -10,6 +10,7 @@ use App\Http\Controllers\CinemaController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use PHPUnit\Framework\Attributes\Group;
@@ -22,6 +23,13 @@ Route::get('/schedules/detail/{movie_id}', [MovieController::class, 'movieSchedu
 
 Route::middleware('isUser')->group(function() {
     Route::get('/schedules/{scheduleId}/hours/{hourId}', [ScheduleController::class, 'showSeats'])->name('schedules.show_seats');
+
+    Route::prefix('/tickets')->name('tickets.')->group(function(){
+        Route::post('/', [TicketController::class, 'store'])->name('store');
+        Route::get('/{ticketUd}/order', [TicketController::class, 'orderPage'])->name('order');
+        Route::post('/qrcode', [TicketController::class, 'createQrcode'])->name('qrcode');
+        Route::get('/{ticketId}/payment', [TicketController::class, 'paymentPage'])->name('payment');
+    });
 });
 
 Route::get('/cinema', function ()   {

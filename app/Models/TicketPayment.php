@@ -9,9 +9,9 @@ class TicketPayment extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['ticket_id', 'qrcode', 'booked_data', 'paid_date'];
+    protected $fillable = ['ticket_id', 'qrcode', 'booked_date', 'paid_date'];
 
     public function ticket() {
-        return $this->belongsTo(Ticket::class); 
+        return $this->belongsTo(Ticket::class);
     }
 }

@@ -122,7 +122,7 @@
                 btnCreateOrder.style.background = "#112646";
                 btnCreateOrder.style.color = 'white';
                 btnCreateOrder.classList.remove("bg-light");
-                // fungsi untuk memanggil ajax, di jalankan ketiak btn di klik
+                // fungsi untuk memanggil ajax, di jalankan ketika btn di klik
                 btnCreateOrder.onclick = CreateOrder;
             } else {
                 btnCreateOrder.style.background = '';
@@ -133,7 +133,7 @@
 
         function CreateOrder() {
             let data = {
-                user_id: $("$user_id").val(), // ambil value dari input:hidden
+                user_id: $("#user_id").val(), // ambil value dari input:hidden
                 schedule_id: $("#schedule_id").val(),
                 rows_of_seats: seats,
                 quantity: seats.length,
@@ -144,12 +144,14 @@
             }
             // ajax (asyncronus javascript and XML) : memproses data ke atau dari border
             $.ajax({
-                url: "", //route menuju prosses data
-                method: POST, //https method
+                url: "{{ route('tickets.store') }}", //route menuju prosses data
+                method: "POST", //https method
                 data: data, // data yg akan di kirim ke BE
                 success: function(response){
                     // kalau berhasil ngapain
-                    console.log(response);
+                    let ticketId = response.data.id;
+                    // pindah halaman  : window.location.href
+                    window.location.href = `/tickets/${ticketId}/order`;
                 },
                 error: function(message) {
                     // kalau gagal mau ngapain
