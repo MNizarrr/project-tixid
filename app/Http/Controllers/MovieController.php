@@ -23,6 +23,16 @@ class MovieController extends Controller
         return view('admin.movie.index', compact('movies'));
     }
 
+    public function chart()
+    {
+        $filmActive = Movie::where('activated', 1)->count(); // yg di perlukan hanya jumlah, count()
+        $filmNonActive = Movie::where('activated', 0)->count();
+        $data = [$filmActive, $filmNonActive];
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
     public function datatables()
     {
         $movies = Movie::query();

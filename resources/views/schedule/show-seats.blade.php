@@ -46,18 +46,23 @@
                             <div style="width: 60px;"></div>
                         @endif
                         {{-- bikin style kotak no kursi --}}
+                        @php
+                        $seat = $row . "-" . $col;
+                    @endphp
+                    {{-- cek apakah di array  --}}
+                    @if (in_array($seat, $seatsFormat))
+                        {{-- bikin style kotak no kursi --}}
+                        <div style="background: #eaeaea; color: black; width: 40px; height: 40px; margin: 5px; border-radius: 5px; text-align: center; padding-top: 3px;">
+                            <small><b>{{ $row }} - {{ $col }}</b></small>
+                        </div>
+                    @else
+                        {{-- bikin style kotak no kursi --}}
                         <div style="background: #112646; color: white; width: 40px; height: 40px; margin: 5px; border-radius: 5px; text-align: center; padding-top: 3px; cursor: pointer;"
                             onclick="selectSeat('{{ $schedule->price }}', '{{ $row }}', '{{ $col }}', this)">
                             <small><b>{{ $row }} - {{ $col }}</b></small>
                         </div>
+                    @endif
                     @endforeach
-                    @if ($row == 'C')
-                        <div style="height: 80px;"></div>
-                    @endif
-
-                    @if ($row == 'F')
-                        <div style="height: 80px;"></div>
-                    @endif
                 </div>
             @endforeach
         </div>
@@ -147,13 +152,13 @@
                 url: "{{ route('tickets.store') }}", //route menuju prosses data
                 method: "POST", //https method
                 data: data, // data yg akan di kirim ke BE
-                success: function(response){
+                success: function (response) {
                     // kalau berhasil ngapain
                     let ticketId = response.data.id;
                     // pindah halaman  : window.location.href
                     window.location.href = `/tickets/${ticketId}/order`;
                 },
-                error: function(message) {
+                error: function (message) {
                     // kalau gagal mau ngapain
                     alert('Gagal membuat data ticket!');
                 }

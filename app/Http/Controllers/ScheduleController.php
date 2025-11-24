@@ -6,6 +6,7 @@ use App\Exports\ScheduleExport;
 use App\Models\Schedule;
 use App\Models\Cinema;
 use App\Models\Movie;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use App\Exports\UserExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -206,6 +207,20 @@ public function datatables()
     {
         $schedule = Schedule::where('id', $scheduleId)->with('cinema')->first();
         $hour = $schedule['hours'][$hourId];
-        return view('schedule.show-seats', compact('schedule', 'hour'));
+        // ambil data kursi yang sudah di beli engan kriteria :
+        // 1. udah di bayar (ada pait_date)
+        // 2. tiket di beli di tgl dan jam sesuai yg di klik
+        $seats = Ticket::where('schedule_id', $scheduleId)->whereHas('ticketPayment', function($q) {
+            // ambil tanggal sekarang
+            $date = now()->format('Y-m-d');
+            // whereDate : mencari berdasarkan tanggal
+            $q->whereDate('paid_date', $date);
+        })->whereTime('hour', $hour)->pluck('rows_of_seats');
+        // pluck() : mengambil data hanya satu column
+        // mengganti array dua dimensi menjadi satu dimensi
+        $seatsFormat = array_merge(...$seats);
+        // ... : spread operator, mengeluarkan isi array. array_merge() menggabungkan isi array. jd mengeluarkan dr dimensi kedua, digabungkan ke dimensi pertama
+        // dd($seatsFormat);
+        return view('schedule.show-seats', compact('schedule', 'hour', 'seatsFormat'));
     }
 }
