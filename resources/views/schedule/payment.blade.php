@@ -37,7 +37,11 @@
                 @endphp
                 <b>Rp. {{ number_format($price, 0, ',', '.') }}</b>
             </div>
-            <button class="btn btn-lg btn-block btn-primary">Sudah Dibayar</button>
+            <form action="{{ route('tickets.payment.status', $ticket->id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <button class="btn btn-lg btn-block btn-primary">Sudah Dibayar</button>
+            </form>
         </div>
     </div>
 @endsection

@@ -8,6 +8,7 @@ use App\Models\TicketPayment;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TicketController extends Controller
 {
@@ -93,7 +94,7 @@ class TicketController extends Controller
         ]);
 
         // update promo_id pada tickets jika ada promo yang di pilih (bukan null)
-        if($request->promo_id != null) {
+        if ($request->promo_id != null) {
             $promo = Promo::find($request->promo_id);
             if ($promo['type'] == 'percent') {
                 $discount = $ticket['total_price'] * $promo['discount'] / 100;
@@ -104,7 +105,7 @@ class TicketController extends Controller
             $ticket->update([
                 'total_price' => $totalPriceNew,
                 'promo_id' => $request->promo_id
-        ]);
+            ]);
         }
         return response()->json([
             'message' => 'Berhasil membuat data pembayaran dan update promo tiket!',
@@ -117,6 +118,36 @@ class TicketController extends Controller
         $ticket = Ticket::where('id', $ticketId)->with('ticketPayment')->first();
         // dd(vars: $ticket);
         return view('schedule.payment', compact('ticket'));
+    }
+
+    public function updateStatusPayment(Request $request, $ticketId)
+    {
+        $updateData = TicketPayment::where('ticket_id', $ticketId)->update([
+            'status' => 'paid-off',
+            'paid_date' => now()
+        ]);
+        if ($updateData) {
+            Ticket::where('id', $ticketId)->update(['activated' => 1]);
+        }
+        return redirect()->route('tickets.payment.proof', $ticketId);
+    }
+
+    public function proofPayment($ticketId)
+    {
+        $ticket = Ticket::where('id', $ticketId)->with(['schedule', 'schedule.cinema', 'schedule.movie', 'promo', 'ticketPayment'])->first();
+
+        return view('schedule.proof-payment', compact('ticket'));
+    }
+
+    public function exportPdf($ticketId)
+    {
+        $ticket = Ticket::where('id', $ticketId)->with(['schedule', 'schedule.cinema', 'schedule.movie', 'promo', 'ticketPayment'])->first()->toArray();
+
+        view()->share('ticket', $ticket);
+
+        $pdf = Pdf::loadView('schedule.export-pdf', $ticket);
+        $fileName = 'TICKET' . $ticket['id'] . '.pdf';
+        return $pdf->download($fileName);
     }
 
     /**

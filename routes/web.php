@@ -26,9 +26,12 @@ Route::middleware('isUser')->group(function() {
 
     Route::prefix('/tickets')->name('tickets.')->group(function(){
         Route::post('/', [TicketController::class, 'store'])->name('store');
-        Route::get('/{ticketUd}/order', [TicketController::class, 'orderPage'])->name('order');
+        Route::get('/{ticketId}/order', [TicketController::class, 'orderPage'])->name('order');
         Route::post('/qrcode', [TicketController::class, 'createQrcode'])->name('qrcode');
         Route::get('/{ticketId}/payment', [TicketController::class, 'paymentPage'])->name('payment');
+        Route::patch('/{ticketId}/payment/status', [TicketController::class, 'updateStatusPayment'])->name('payment.status');
+        Route::get('/{ticketId}/payment/proof', [TicketController::class, 'proofPayment'])->name('payment.proof');
+        Route::get('/{ticketId}/pdf', [TicketController::class, 'exportPdf'])->name('export_pdf');
     });
 });
 
